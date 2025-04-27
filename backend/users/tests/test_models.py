@@ -26,7 +26,7 @@ def test_user_profile_creation():
     assert profile.avatar.name.startswith('avatars/')
 
 @pytest.mark.django_db
-def test_user_profile_creation_default_bio():
+def test_user_profile_creation_default_bio_no_avatar():
     """Test creation of User profile with default bio and no avatar."""
     user = User.objects.create_user(
         username='testuser', password='testpass123'

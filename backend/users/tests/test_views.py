@@ -4,7 +4,7 @@ from ..models import UserProfile
 
 @pytest.mark.django_db
 def test_register_view(api_client):
-    """Test register view creating new user"""
+    """Test register view creating new user."""
     data = {
         "username": "testuser",
         "password": "testpass123",

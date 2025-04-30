@@ -27,3 +27,17 @@ def test_post(test_user):
 @pytest.fixture
 def unauthenticated_client():
     return APIClient()
+
+@pytest.fixture
+def second_user():
+    return User.objects.create_user(
+        username="testuser2", password="testpass1234"
+    )
+
+@pytest.fixture
+def second_client(second_user):
+    refresh = RefreshToken.for_user(second_user)
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+    return client
+

@@ -1,19 +1,14 @@
 import pytest
 from ..models import Post
-from django.contrib.auth.models import User
 from django.db import IntegrityError
-import datetime
 from django.utils import timezone
 
 
 @pytest.mark.django_db
-def test_post_creation():
+def test_post_creation(test_user):
     """Test creation of new post."""
-    user = User.objects.create_user(
-        username='testuser', password='testpass123'
-    )
     post = Post.objects.create(
-        user = user,
+        user = test_user,
         content = "This is my test post!",
     )
     assert post.user.username == 'testuser'
@@ -28,14 +23,11 @@ def test_post_creation_invalid():
     )
         
 @pytest.mark.django_db
-def test_post_creation_auto_created_at_field():
+def test_post_creation_auto_created_at_field(test_user):
     """Test that 'created_at' is automatically set to current time."""
-    user = User.objects.create_user(
-        username='testuser', password='testpass123'
-    )
     before_creation = timezone.now() # Time before creating post
     post = Post.objects.create(
-        user = user,
+        user = test_user,
         content = "This is my test post!",
     )
     after_creation = timezone.now() # Time after creating post

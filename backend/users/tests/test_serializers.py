@@ -4,7 +4,7 @@ from ..models import UserProfile
 
 @pytest.mark.django_db
 def test_register_serializer_create_valid_data():
-    """Test register serializer creates valid user"""
+    """Test register serializer creates valid user."""
     data = {
         "username": "testuser",
         "password": "testpass123",
@@ -19,6 +19,7 @@ def test_register_serializer_create_valid_data():
 
 @pytest.mark.django_db
 def test_register_serializer_password_write_only():
+    """Test password is not readable."""
     data = {
         "username": "testuser",
         "password": "testpass123",
@@ -32,7 +33,7 @@ def test_register_serializer_password_write_only():
 
 @pytest.mark.django_db
 def test_register_serializer_create_invalid_data():
-    """Test register serializer with invalid data"""
+    """Test register serializer with invalid data."""
     data = {
         "password": "testpass123",
         "last_name": "Doe",

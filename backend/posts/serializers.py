@@ -16,11 +16,14 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['id', 'post', 'content', 'created_at']
+        fields = ['id', 'content', 'created_at']
         extra_kwargs = {
             'created_at': {'read_only': True}
         }
     
     def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
+        validated_data.update({
+            'user': self.context['request'].user,
+            'post_id': self.context['view'].kwargs['post_pk'],
+        })
         return super().create(validated_data)

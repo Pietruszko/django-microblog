@@ -24,6 +24,6 @@ class CommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.update({
             'user': self.context['request'].user,
-            'post_id': self.context['view'].kwargs['post_pk'],
+            # 'post_id': self.context['view'].kwargs['post_pk'], <-- stopped working
         })
         return super().create(validated_data)

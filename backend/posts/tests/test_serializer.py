@@ -31,13 +31,12 @@ def test_comment_serializer_create_valid_data(test_user, test_post):
 
     data = {
         "content": "Comment testing serializer",
-        "post": test_post.id
     }
     serializer = CommentSerializer(
         data=data, context={'request': request}
     )
     assert serializer.is_valid(), serializer.errors
-    comment = serializer.save()
+    comment = serializer.save(post=test_post)
     assert comment.content == data["content"]
     assert comment.user == test_user
     assert Comment.objects.count() == 1

@@ -2,7 +2,7 @@ import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
-from ..models import Post
+from ..models import Post, Comment
 
 @pytest.fixture
 def test_user():
@@ -40,4 +40,12 @@ def second_client(second_user):
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
     return client
+
+@pytest.fixture
+def test_comment(test_user, test_post):
+    return Comment.objects.create(
+        content="Test comment",
+        user=test_user,
+        post=test_post,
+    )
 

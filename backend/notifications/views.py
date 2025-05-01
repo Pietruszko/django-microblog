@@ -1,3 +1,27 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
+from .models import Notification
+from .serializers import NotificationSerializer
+from rest_framework.permissions import IsAuthenticated, BasePermission
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
-# Create your views here.
+class IsNotificationOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.recipient == request.user
+
+class NotificationViewSet(ModelViewSet):
+    queryset = Notification.objects.all()
+    permission_classes = [IsAuthenticated, IsNotificationOwner]
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        return self.request.user.notifications.select_related(
+            'sender', 'post', 'comment'
+        )
+    
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+
+    @action(detail=False, methods=['post'])
+    def mark_all_read(self, request):
+        updated = request.user.notifications.filter(is_read=False).update(is_read=True)
+        return Response({'marked_read': updated})

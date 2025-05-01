@@ -1,6 +1,6 @@
 import pytest
-from ..serializers import PostSerializer
-from ..models import Post
+from ..serializers import PostSerializer, CommentSerializer
+from ..models import Post, Comment
 from rest_framework.test import APIRequestFactory
 
 @pytest.mark.django_db
@@ -21,3 +21,23 @@ def test_post_serializer_create_valid_data(test_user):
     assert post.content == data["content"]
     assert post.user == test_user
     assert Post.objects.count() == 1
+
+@pytest.mark.django_db
+def test_comment_serializer_create_valid_data(test_user, test_post):
+    """Test comment serializer creates valid comment."""
+    factory = APIRequestFactory()
+    request = factory.post("/test-url/")
+    request.user = test_user
+
+    data = {
+        "content": "Comment testing serializer",
+        "post": test_post.id
+    }
+    serializer = CommentSerializer(
+        data=data, context={'request': request}
+    )
+    assert serializer.is_valid(), serializer.errors
+    comment = serializer.save()
+    assert comment.content == data["content"]
+    assert comment.user == test_user
+    assert Comment.objects.count() == 1

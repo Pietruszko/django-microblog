@@ -4,6 +4,7 @@ from .serializers import NotificationSerializer
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
 class IsNotificationOwner(BasePermission):
     """Custom permission."""
@@ -14,6 +15,8 @@ class NotificationViewSet(ModelViewSet):
     queryset = Notification.objects.all()
     permission_classes = [IsAuthenticated, IsNotificationOwner]
     serializer_class = NotificationSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['is_read']
 
     def get_queryset(self):
         return self.request.user.notifications.select_related(

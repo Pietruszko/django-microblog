@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 class IsNotificationOwner(BasePermission):
+    """Custom permission."""
     def has_object_permission(self, request, view, obj):
         return obj.recipient == request.user
 
@@ -23,5 +24,11 @@ class NotificationViewSet(ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def mark_all_read(self, request):
-        updated = request.user.notifications.filter(is_read=False).update(is_read=True)
-        return Response({'marked_read': updated})
+        request.user.notifications.filter(is_read=False).update(is_read=True)
+        return Response(status=200)
+    
+    @action(detail=False, methods=['delete'])
+    def delete_all(self, request):
+        request.user.notifications.all().delete()
+        return Response(status=204)
+

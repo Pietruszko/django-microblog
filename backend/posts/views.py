@@ -28,18 +28,20 @@ class PostViewSet(ModelViewSet):
         return super().get_queryset()
     
 class CommentViewSet(ModelViewSet):
-    queryset = Comment.objects.all() # Default queryset (required for router)
+    queryset = Comment.objects.select_related('user__userprofile').all() # Default queryset (required for router)
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     serializer_class = CommentSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['user', 'post']
     search_fields = ['content', 'user_username', 'post__content']
     ordering_fields = ['created_at']
-    ordering = ['-created_at']
+    ordering = ['created_at']
+    pagination_class = None
 
     def get_queryset(self):
         post_id = self.kwargs['post_pk']
         return Comment.objects.filter(post_id=post_id)
+
     
     def perform_create(self, serializer):
         post_id = self.kwargs['post_pk']

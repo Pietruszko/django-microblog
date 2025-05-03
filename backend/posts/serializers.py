@@ -17,9 +17,11 @@ class PostSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
     
 class CommentSerializer(serializers.ModelSerializer):
+    user_first_name = serializers.CharField(source='user.userprofile.first_name', read_only=True)
+    user_avatar = serializers.ImageField(source='user.userprofile.avatar', read_only=True)
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'created_at']
+        fields = ['id', 'content', 'created_at', 'user_first_name', 'user_avatar']
         extra_kwargs = {
             'created_at': {'read_only': True}
         }

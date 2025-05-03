@@ -15,7 +15,7 @@ class IsOwnerOrReadOnly(BasePermission):
         
 
 class PostViewSet(ModelViewSet):
-    queryset = Post.objects.all() # Default queryset (required for router)
+    queryset = Post.objects.select_related('user__userprofile').all() # Default queryset (required for router)
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     serializer_class = PostSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

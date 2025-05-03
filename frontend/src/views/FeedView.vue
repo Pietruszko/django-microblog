@@ -29,6 +29,37 @@
                 <p class="text-gray-400 text-sm">
                     {{ new Date(post.created_at).toLocaleString() }}
                 </p>
+                <textarea 
+                    v-model="commentInputs[post.id]" 
+                    placeholder="Comment..." 
+                    required 
+                    class="w-full p-2 mt-2 bg-gray-700 text-white rounded">
+                </textarea>
+                <button 
+                    @click="handleCreateComment(post.id)" 
+                    class="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded">
+                    Submit Comment
+                </button>
+                <div v-if="commentsByPost[post.id]" class="mt-3">
+                    <h4 class="text-white mb-1">Comments:</h4>
+                    <div 
+                        v-for="comment in commentsByPost[post.id]" 
+                        :key="comment.id" 
+                        class="p-2 mb-2 bg-gray-700 rounded text-white"
+                    >
+                        <div class="flex items-center mb-2">
+                            <img 
+                                v-if="comment.user_avatar" 
+                                :src="comment.user_avatar" 
+                                class="w-8 h-8 rounded-full mr-2">
+                            <span class="text-white font-medium">{{ comment.user_first_name }}</span>
+                        </div>
+                        <p class="text-sm">{{ comment.content }}</p>
+                        <p class="text-xs text-gray-400">
+                            {{ new Date(comment.created_at).toLocaleString() }}
+                        </p>
+                    </div>
+                </div>
             </div>
             <button 
                 @click="handleLogout" 
@@ -49,6 +80,8 @@ const posts = ref([])
 const postForm = ref({
     content: ''
 })
+const commentInputs = ref({})
+const commentsByPost = ref({})
 
 const handleLogout = async () => {
     try {
@@ -69,14 +102,40 @@ const handleCreatePost = async () => {
     }
 }
 
+const handleCreateComment = async (postId) => {
+    try {
+        const content = commentInputs.value[postId]
+        if (!content) return
+
+        await api.post(`posts/${postId}/comments/`, { content })
+        commentInputs.value[postId] = ''
+        await fetchCommentsForPost(postId)  // refresh comment list
+    } catch (error) {
+        alert('Failed to create Comment')
+    }
+}
+
 onMounted(fetchPosts)
 
 async function fetchPosts() {
     try {
         const response = await api.get('posts/')
         posts.value = response.data.results || response.data
+
+        for (const post of posts.value) {
+            await fetchCommentsForPost(post.id)
+        }
     } catch (error) {
         console.error('Error fetching Posts:', error)
+    }
+}
+
+async function fetchCommentsForPost(postId) {
+    try {
+        const response = await api.get(`posts/${postId}/comments/`)
+        commentsByPost.value[postId] = response.data
+    } catch (error) {
+        console.error(`Error fetching comments for post ${postId}:`, error)
     }
 }
 </script>

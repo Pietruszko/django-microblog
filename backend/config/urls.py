@@ -24,6 +24,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_nested.routers import NestedDefaultRouter
 from notifications.views import NotificationViewSet
+from users.views import UserProfileViewSet
 
 router = DefaultRouter()
 router.register(r'posts', PostViewSet, basename='posts')
@@ -34,6 +35,9 @@ posts_router.register(r'comments', CommentViewSet, basename='post-comments')
 notifications_router = DefaultRouter()
 notifications_router.register(r'notifications', NotificationViewSet, basename='notifications')
 
+users_router = DefaultRouter()
+router.register(r'profiles', UserProfileViewSet, basename='profile')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/', RegisterView.as_view(), name='register'),
@@ -42,6 +46,7 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/', include(posts_router.urls)),
     path('api/', include(notifications_router.urls)),
+    path('api/', include(users_router.urls)),
 ]
 
 if settings.DEBUG:

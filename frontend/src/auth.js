@@ -7,6 +7,18 @@ const api = axios.create({
     }
 })
 
+api.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response?.status === 401) {
+            // Token is invalid - clear it
+            localStorage.removeItem('token')
+            window.location.href = '/login' // Full reload to reset state
+        }
+        return Promise.reject(error)
+    }
+)
+
 const SKIP_AUTH_URLS = ['register', 'login']
 
 api.interceptors.request.use(config => {

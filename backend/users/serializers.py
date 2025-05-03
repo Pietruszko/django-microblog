@@ -23,3 +23,8 @@ class RegisterSerializer(serializers.Serializer):
             avatar=validated_data.get('avatar', None),
         )
         return user
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['first_name', 'last_name', 'bio', 'avatar']

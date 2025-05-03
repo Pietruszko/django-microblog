@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import FeedView from '../views/FeedView.vue'
 import RegisterView from '../views/RegisterView.vue'
+import ProfileView from '@/views/ProfileView.vue'
 
 const routes = [
   {
@@ -25,7 +26,13 @@ const routes = [
     name: 'Register',
     component: RegisterView,
     meta: { forGuestOnly: true }
-  }
+  },
+  {
+    path: '/profile/:username',
+    name: 'Profile',
+    component: ProfileView,
+    meta: { requiresAuth: false }
+  },
 ]
 
 const router = createRouter({

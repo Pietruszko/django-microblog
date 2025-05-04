@@ -1,6 +1,31 @@
 <template>
     <div class="min-h-screen w-full bg-black p-8">
+
+        <div class="flex justify-between items-center bg-gray-900 p-4 rounded-lg mb-6">
+            <div>
+                <RouterLink
+                v-if="currentUserId"
+                :to="{ name: 'Profile', params: { username: currentUserId } }"
+                class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
+                My Profile
+                </RouterLink>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md">
+                Notifications
+                </button>
+
+                <button
+                @click="handleLogout"
+                class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md">
+                Logout
+                </button>
+            </div>
+        </div>
+
         <div class=" border-gray-500 border-2 mx-auto w-160 p-4 rounded-2xl m-32">
+
             <h1 class="text-center text-2xl text-white">How are you today?</h1>
             <h2 class="text-white">Create new post</h2>
             <form @submit.prevent="handleCreatePost" class="input-form">
@@ -16,6 +41,7 @@
                     Post
                 </button>
             </form>
+
             <h3 class="text-white mt-5">Newest posts:</h3>
             <div v-for="post in posts" :key="post.id" class="mb-4 p-4 bg-gray-800 rounded-lg">
                 <div class="flex items-center mb-2">
@@ -23,7 +49,11 @@
                         v-if="post.user_avatar" 
                         :src="post.user_avatar" 
                         class="w-8 h-8 rounded-full mr-2">
-                    <span class="text-white font-medium">{{ post.user_first_name }}</span>
+                    <RouterLink
+                        :to="{ name: 'Profile', params: { username: post.user_id} }"
+                        class="text-white font-medium hover:underline">
+                        <span class="text-white font-medium">{{ post.user_first_name }}</span>
+                    </RouterLink>
                 </div>
                 <p class="text-white">{{ post.content }}</p>
                 <p class="text-gray-400 text-sm">
@@ -52,7 +82,11 @@
                                 v-if="comment.user_avatar" 
                                 :src="comment.user_avatar" 
                                 class="w-8 h-8 rounded-full mr-2">
-                            <span class="text-white font-medium">{{ comment.user_first_name }}</span>
+                            <RouterLink
+                                :to="{ name: 'Profile', params: { username: comment.user_id} }"
+                                class="text-white font-medium hover:underline">
+                                <span class="text-white font-medium">{{ comment.user_first_name }}</span>
+                            </RouterLink>
                         </div>
                         <p class="text-sm">{{ comment.content }}</p>
                         <p class="text-xs text-gray-400">
@@ -61,11 +95,6 @@
                     </div>
                 </div>
             </div>
-            <button 
-                @click="handleLogout" 
-                class="mt-4 bg-red-500 rounded-3xl p-1.5 hover:bg-red-600 text-white w-50">
-                Logout
-            </button> 
         </div>
     </div>
 </template>
@@ -75,6 +104,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/auth.js'
 import { useRouter } from 'vue-router'
 
+const currentUserId = localStorage.getItem('user_id')
 const router = useRouter()
 const posts = ref([])
 const postForm = ref({
@@ -86,6 +116,7 @@ const commentsByPost = ref({})
 const handleLogout = async () => {
     try {
         localStorage.removeItem('token')
+        localStorage.removeItem('user_id')
         router.push('/login')
     } catch (error) {
         console.error('Error logging out:', error)

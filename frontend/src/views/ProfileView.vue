@@ -1,5 +1,8 @@
 <template>
     <div class="min-h-screen bg-black text-white p-4">
+
+      <NavBar />
+
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-8">
         Loading profile...
@@ -44,6 +47,7 @@
   import { ref, computed, onMounted } from 'vue'
   import { useRoute } from 'vue-router'
   import api from '@/auth.js'
+  import NavBar from '@/components/NavBar.vue'
   
   const route = useRoute()
   const profile = ref(null)

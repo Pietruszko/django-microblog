@@ -1,28 +1,7 @@
 <template>
     <div class="min-h-screen w-full bg-black p-8">
 
-        <div class="flex justify-between items-center bg-gray-900 p-4 rounded-lg mb-6">
-            <div>
-                <RouterLink
-                v-if="currentUserId"
-                :to="{ name: 'Profile', params: { username: currentUserId } }"
-                class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md">
-                My Profile
-                </RouterLink>
-            </div>
-
-            <div class="flex items-center space-x-4">
-                <button class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md">
-                Notifications
-                </button>
-
-                <button
-                @click="handleLogout"
-                class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md">
-                Logout
-                </button>
-            </div>
-        </div>
+        <NavBar />
 
         <div class=" border-gray-500 border-2 mx-auto w-160 p-4 rounded-2xl m-32">
 
@@ -103,8 +82,8 @@
 import { ref, onMounted } from 'vue'
 import api from '@/auth.js'
 import { useRouter } from 'vue-router'
+import NavBar from '@/components/NavBar.vue'
 
-const currentUserId = localStorage.getItem('user_id')
 const router = useRouter()
 const posts = ref([])
 const postForm = ref({
@@ -112,16 +91,6 @@ const postForm = ref({
 })
 const commentInputs = ref({})
 const commentsByPost = ref({})
-
-const handleLogout = async () => {
-    try {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user_id')
-        router.push('/login')
-    } catch (error) {
-        console.error('Error logging out:', error)
-    }
-}
 
 const handleCreatePost = async () => {
     try {

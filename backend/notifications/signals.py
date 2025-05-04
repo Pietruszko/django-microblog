@@ -6,10 +6,11 @@ from .models import Notification
 @receiver(post_save, sender=Comment)
 def create_comment_notification(sender, instance, created, **kwargs):
     if created and instance.user != instance.post.user:
+        first_name = instance.user.userprofile.first_name  # Access UserProfile
         Notification.objects.create(
             recipient=instance.post.user,
             sender=instance.user,
             post=instance.post,
             comment=instance,
-            message=f"{instance.user.username} commented: {instance.content[:30]}..."
+            message=f"{first_name} commented: {instance.content[:30]}..."
         )

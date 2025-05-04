@@ -47,7 +47,11 @@
                     <div 
                         v-for="notification in notifications" 
                         :key="notification.id" 
-                        class="p-2 hover:bg-gray-700 cursor-pointer"
+                        class="p-2 hover:bg-gray-700 cursor-pointer transition-colors duration-200"
+                        :class="{
+                          'bg-gray-700 border-l-2 border-blue-500': !notification.is_read,
+                          'bg-gray-800': notification.is_read
+                        }"
                         @click="handleNotificationClick(notification)"
                     >
                         <p class="text-sm text-white">{{ notification.message }}</p>
@@ -83,6 +87,8 @@
   const showNotifications = ref(false)
   const notificationsDropdown = ref(null)
   const notifications = ref([])
+  const loading = ref(false)
+  
   
   // Handle click outside to close notifications
   const handleClickOutside = (event) => {
@@ -100,9 +106,12 @@
     document.removeEventListener('click', handleClickOutside)
   })
   
-  const toggleNotifications = (event) => {
+  const toggleNotifications = async (event) => {
     event?.stopPropagation()
     showNotifications.value = !showNotifications.value
+    if (showNotifications.value) {
+      await fetchNotifications()
+    }
   }
   
   const closeNotifications = () => {
@@ -118,15 +127,48 @@
       console.error('Error logging out:', error)
     }
   }
+  
+  const handleNotificationClick = async (notification) => {
+  try {
+    // Mark as read if needed
+    if (!notification.is_read) {
+      await api.patch(`notifications/${notification.id}/`, { is_read: true })
+    }
 
-  onMounted(fetchNotifications)
+    // Check if we're already viewing this post
+    const currentPostId = router.currentRoute.value.params.id
+    const isSamePost = currentPostId === String(notification.post_id)
 
+    if (isSamePost) {
+      await router.push({
+        name: 'PostDetail',
+        params: { id: notification.post_id },
+        query: { refresh: Date.now() } // Unique value forces update
+      })
+    } else {
+      // Normal navigation for different posts
+      await router.push({
+        name: 'PostDetail', 
+        params: { id: notification.post_id }
+      })
+    }
+
+    closeNotifications()
+    await fetchNotifications()
+  } catch (error) {
+    console.error('Error handling notification:', error)
+  }
+}
+  
   async function fetchNotifications() {
     try {
-        const response = await api.get('notifications/')
-        notifications.value = response.data.results || response.data
+      loading.value = true
+      const response = await api.get('notifications/')
+      notifications.value = response.data.results || response.data
     } catch (error) {
-        console.error('Error fetching Notifications:', error)
+      console.error('Error fetching Notifications:', error)
+    } finally {
+      loading.value = false
     }
-}
+  }
   </script>

@@ -3,6 +3,7 @@ import LoginView from '../views/LoginView.vue'
 import FeedView from '../views/FeedView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import PostView from '@/views/PostView.vue'
 
 const routes = [
   {
@@ -31,6 +32,12 @@ const routes = [
     path: '/profile/:username',
     name: 'Profile',
     component: ProfileView,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/posts/:id',
+    name: 'PostDetail',
+    component: PostView,
     meta: { requiresAuth: false }
   },
 ]

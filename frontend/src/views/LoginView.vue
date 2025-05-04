@@ -43,6 +43,7 @@ const handleLogin = async () => {
     try {
         const response = await api.post('login/', form.value)
         localStorage.setItem('token', response.data.access)
+        localStorage.setItem('user_id', response.data.user_id)
         router.push('/feed')
     } catch (error) {
         alert('Login failed!')

@@ -26,9 +26,15 @@ class RegisterSerializer(serializers.Serializer):
         return user
     
 class UserProfileSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+    
     class Meta:
         model = UserProfile
-        fields = ['first_name', 'last_name', 'bio', 'avatar']
+        fields = ['id', 'user_id', 'first_name', 'last_name', 'bio', 'avatar']
+        extra_kwargs = {
+            'bio': {'required': False, 'allow_blank': True},
+            'avatar': {'required': False}
+        }
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

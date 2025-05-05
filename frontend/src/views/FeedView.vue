@@ -28,21 +28,25 @@
             v-for="post in posts" 
             :key="post.id" 
             class="border-gray-500 border-2 p-4 rounded-2xl bg-gray-800">
-            <div class="flex items-center mb-2">
-              <img 
-                v-if="post.user_avatar" 
-                :src="post.user_avatar" 
-                class="w-8 h-8 rounded-full mr-2">
-              <RouterLink
-                :to="{ name: 'Profile', params: { username: post.user_id} }"
-                class="text-white font-medium hover:underline">
-                <span class="text-white font-medium">{{ post.user_first_name }}</span>
-              </RouterLink>
+            <div @click="goToPost(post.id)" class="cursor-pointer">
+              <div class="flex items-center mb-2">
+                  <img 
+                    v-if="post.user_avatar" 
+                    :src="post.user_avatar" 
+                    @click.stop=""
+                    class="w-8 h-8 rounded-full mr-2 cursor-default">
+                <RouterLink
+                  :to="{ name: 'Profile', params: { username: post.user_id} }"
+                  @click.stop=""
+                  class="text-white font-medium hover:underline">
+                  <span class="text-white font-medium">{{ post.user_first_name }}</span>
+                </RouterLink>
+              </div>
+              <p class="text-white">{{ post.content }}</p>
+              <p class="text-gray-400 text-sm">
+                {{ new Date(post.created_at).toLocaleString() }}
+              </p>
             </div>
-            <p class="text-white">{{ post.content }}</p>
-            <p class="text-gray-400 text-sm">
-              {{ new Date(post.created_at).toLocaleString() }}
-            </p>
             <textarea 
               v-model="commentInputs[post.id]" 
               placeholder="Comment..." 
@@ -110,6 +114,7 @@
   import { ref, onMounted, onUnmounted } from 'vue'
   import api from '@/auth.js'
   import NavBar from '@/components/NavBar.vue'
+  import { useRouter } from 'vue-router'
   
   const posts = ref([])
   const postForm = ref({ content: '' })
@@ -120,7 +125,11 @@
   const loading = ref(false)
   const loadingComments = ref({})
   const noMorePosts = ref(false)
-  
+  const router = useRouter()
+
+  function goToPost(postId) {
+    router.push({ name: 'PostDetail', params: { id: postId } })
+}
   
   const handleScroll = () => {
     if (loading.value || noMorePosts.value) return

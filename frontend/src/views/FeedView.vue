@@ -54,7 +54,7 @@
               class="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded">
               Submit Comment
             </button>
-            <div v-if="commentsByPost[post.id]" class="mt-3">
+            <div v-if="commentsByPost[post.id]?.results" class="mt-3">
               <h4 class="text-white mb-1">Comments:</h4>
               <div 
                 v-for="comment in commentsByPost[post.id].results" 
@@ -118,22 +118,18 @@
   const currentPage = ref(1)
   const totalPages = ref(1)
   const loading = ref(false)
+  const loadingComments = ref({})
   const noMorePosts = ref(false)
   
   
   const handleScroll = () => {
-    if (loading.value || noMorePosts.value || currentPage.value >= totalPages.value) return
+    if (loading.value || noMorePosts.value) return
 
-    const scrollPosition = window.innerHeight + window.scrollY
-    const documentHeight = document.documentElement.scrollHeight
-    const threshold = 150
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement
+    const threshold = 100 // pixels from bottom
 
-    const pageIsShort = documentHeight <= window.innerHeight + 1
-
-    if (pageIsShort) return
-
-    if (scrollPosition >= documentHeight - threshold) {
-        loadMorePosts()
+    if (scrollTop + clientHeight >= scrollHeight - threshold) {
+      loadMorePosts()
     }
 }
   
@@ -161,24 +157,24 @@
   
   
   async function loadMorePosts() {
-    if (currentPage.value >= totalPages.value) {
+    if (currentPage.value >= totalPages.value || loading.value) {
       noMorePosts.value = true
       return
     }
-  
+
     try {
       loading.value = true
       const nextPage = currentPage.value + 1
       const response = await api.get(`posts/?page=${nextPage}`)
       
       if (response.data.results?.length) {
-        posts.value = [...posts.value, ...response.data.results]
+        // Store the new posts in a variable before assigning
+        const newPosts = response.data.results
+        posts.value = [...posts.value, ...newPosts]
         currentPage.value = nextPage
         
-        
-        for (const post of response.data.results) {
-          await fetchCommentsForPost(post.id)
-        }
+        // Fetch comments for all new posts in parallel
+        await Promise.all(newPosts.map(post => fetchCommentsForPost(post.id)))
       } else {
         noMorePosts.value = true
       }
@@ -187,23 +183,26 @@
     } finally {
       loading.value = false
     }
-  }
+}
   
   async function fetchCommentsForPost(postId, page = 1) {
-  try {
-    const response = await api.get(`posts/${postId}/comments/?page=${page}`)
-    
-    if (page === 1) {
-      commentsByPost.value[postId] = response.data
-    } else {
-      commentsByPost.value[postId] = {
-        ...response.data,
-        results: [...commentsByPost.value[postId].results, ...response.data.results]
+    try {
+      loadingComments.value[postId] = true
+      const response = await api.get(`posts/${postId}/comments/?page=${page}`)
+      
+      if (page === 1) {
+        commentsByPost.value[postId] = response.data
+      } else {
+        commentsByPost.value[postId] = {
+          ...response.data,
+          results: [...(commentsByPost.value[postId]?.results || []), ...response.data.results]
+        }
       }
+    } catch (error) {
+      console.error(`Error fetching comments for post ${postId}:`, error)
+    } finally {
+      loadingComments.value[postId] = false
     }
-  } catch (error) {
-    console.error(`Error fetching comments for post ${postId}:`, error)
-  }
 }
 
 const loadMoreComments = async (postId) => {

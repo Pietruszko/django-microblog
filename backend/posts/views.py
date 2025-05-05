@@ -36,7 +36,7 @@ class CommentViewSet(ModelViewSet):
     search_fields = ['content', 'user_username', 'post__content']
     ordering_fields = ['created_at']
     ordering = ['created_at']
-    pagination_class = None
+    # pagination_class = None
 
     def get_queryset(self):
         post_id = self.kwargs['post_pk']

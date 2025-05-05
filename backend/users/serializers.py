@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import UserProfile
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from posts.models import Post
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -26,15 +27,22 @@ class RegisterSerializer(serializers.Serializer):
         return user
     
 class UserProfileSerializer(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(source='user.id', read_only=True)
-    
+    user_id = serializers.IntegerField(source='user.id')
+    posts = serializers.SerializerMethodField()
+
     class Meta:
         model = UserProfile
-        fields = ['id', 'user_id', 'first_name', 'last_name', 'bio', 'avatar']
-        extra_kwargs = {
-            'bio': {'required': False, 'allow_blank': True},
-            'avatar': {'required': False}
-        }
+        fields = ['id', 'user_id', 'first_name', 'last_name', 'bio', 'avatar', 'posts']
+    
+    def get_posts(self, obj):
+        posts = Post.objects.filter(user=obj.user).order_by('-created_at')[:5]
+        return [
+            {
+                'id': post.id,
+                'content': post.content,
+                'created_at': post.created_at
+            } for post in posts
+        ]
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):

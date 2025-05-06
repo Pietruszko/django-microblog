@@ -17,17 +17,20 @@ class RegisterSerializer(serializers.Serializer):
             username=validated_data['username'],
             password=validated_data['password'],
         )
-        UserProfile.objects.create(
+        profile = UserProfile.objects.create(
             user=user,
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             bio=validated_data.get('bio', 'This is my profile!'),
-            avatar=validated_data.get('avatar', None),
         )
+        if 'avatar' in validated_data:
+            profile.avatar = validated_data['avatar']
+            profile.save()
         return user
     
 class UserProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user.id')
+    avatar = serializers.ImageField(required=False)
     posts = serializers.SerializerMethodField()
 
     class Meta:

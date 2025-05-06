@@ -11,11 +11,29 @@
     <div v-if="profile" class="max-w-2xl mx-auto">
       <!-- Profile Header Section -->
       <div class="flex items-center gap-4 mb-6">
-        <img 
-          :src="profile.avatar || '/default-avatar.png'" 
-          class="w-40 h-40 rounded-full object-cover border-2 border-emerald-400"
-        >
-        <div>
+        <div class="relative">
+          <img 
+            :src="profile.avatar || '/default-avatar.png'" 
+            class="w-40 h-40 rounded-full object-cover border-2 border-emerald-400"
+          >
+          <button 
+            v-if="isOwnProfile"
+            @click="$refs.avatarInput.click()"
+            class="absolute bottom-0 right-0 bg-emerald-500 hover:bg-emerald-600 p-2 rounded-full"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+            </svg>
+          </button>
+          <input 
+            type="file"
+            ref="avatarInput"
+            @change="handleAvatarChange"
+            accept="image/*"
+            class="hidden"
+          >
+        </div>
+      <div>
           <h1 class="text-2xl font-bold">
             {{ profile.first_name }} {{ profile.last_name }}
           </h1>
@@ -29,7 +47,7 @@
             v-model="editBio"
             class="w-full p-2 mb-2 bg-gray-700 text-white rounded"
             rows="4"
-            placeholder="Tell us about yourself"
+            placeholder="Tell us about yourself..."
           ></textarea>
           <div class="flex space-x-2">
             <button
@@ -101,6 +119,7 @@ const profile = ref(null)
 const loading = ref(true)
 const editMode = ref(false)
 const editBio = ref('')
+const avatarInput = ref(null)
 
 function goToPost(postId) {
     router.push({ name: 'PostDetail', params: { id: postId } })
@@ -116,11 +135,37 @@ async function fetchProfile() {
     loading.value = true
     const response = await api.get(`profiles/${route.params.username}/`)
     profile.value = response.data
+    editBio.value = response.data.bio || ''  // This is the key line!
   } catch (err) {
     console.error('Profile fetch error:', err)
     if (err.response?.status === 401) router.push('/login')
   } finally {
     loading.value = false
+  }
+}
+
+const handleAvatarChange = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  try {
+    loading.value = true
+    
+    const formData = new FormData()
+    formData.append('avatar', file)
+    
+    const response = await api.patch(`profiles/${localStorage.getItem('user_id')}/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    profile.value.avatar = response.data.avatar
+  } catch (error) {
+    console.error('Error updating avatar:', error)
+  } finally {
+    loading.value = false
+    event.target.value = '' // Reset input
   }
 }
 

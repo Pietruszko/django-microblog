@@ -12,6 +12,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/backend
+ENV PYTHONPATH=/app
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && \

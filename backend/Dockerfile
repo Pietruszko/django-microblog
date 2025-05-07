@@ -11,12 +11,12 @@ RUN apt-get update && \
     netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /app/backend
 
-COPY backend/requirements.txt .
+COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py migrate && gunicorn backend.config.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]

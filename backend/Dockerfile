@@ -5,7 +5,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    gcc python3-dev && \
+    gcc \
+    python3-dev \
     libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
@@ -18,3 +19,4 @@ RUN pip install --upgrade pip && \
 COPY backend/ .
 
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
+

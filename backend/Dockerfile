@@ -8,7 +8,6 @@ RUN apt-get update && \
     gcc \
     python3-dev \
     libpq-dev \
-    netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -3,11 +3,15 @@ FROM python:3.10-slim as builder
 ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app:/app/backend
 
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc python3-dev && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
 
 COPY backend/requirements.txt .
 RUN pip install --upgrade pip && \

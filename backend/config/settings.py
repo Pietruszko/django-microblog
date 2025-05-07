@@ -88,6 +88,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     'http://frontend',
     'https://django-microblog-backend.onrender.com',
+    'https://django-microblog-frontend.onrender.com',
 ]
 
 CORS_ALLOW_CREDENTIALS = True

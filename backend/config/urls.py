@@ -26,6 +26,17 @@ from rest_framework_nested.routers import NestedDefaultRouter
 from notifications.views import NotificationViewSet
 from users.views import UserProfileViewSet, CustomTokenObtainPairView
 
+from django.http import HttpResponse
+from django.core.management import call_command
+
+def run_migrations(request):
+    call_command('migrate')
+    return HttpResponse("Database migrations completed!")
+temp_patterns = [
+    path('secret-migrate/', run_migrations),  # Secret URL
+]
+
+
 router = DefaultRouter()
 router.register(r'posts', PostViewSet, basename='posts')
 
@@ -51,3 +62,5 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += temp_patterns

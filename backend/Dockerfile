@@ -14,7 +14,7 @@ RUN apt-get update && \
 WORKDIR /app/backend
 ENV PYTHONPATH=/app
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 

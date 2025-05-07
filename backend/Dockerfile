@@ -19,4 +19,4 @@ RUN pip install --upgrade pip && \
 
 COPY . .
 
-CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", "while ! nc -z db 5432; do sleep 1; done && python manage.py migrate && gunicorn backend.config.wsgi:application --bind 0.0.0.0:8000"]

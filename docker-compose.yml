@@ -15,6 +15,7 @@ services:
 
   backend:
     build: ./backend
+    container_name: backend
     volumes:
       - ./backend:/app
       - media_data:/app/media
@@ -32,7 +33,9 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "5173:5173"
+      - "5173:80"
+    depends_on:
+      - backend
     environment:
       - NODE_ENV=development
       - VITE_API_URL=http://backend:8000

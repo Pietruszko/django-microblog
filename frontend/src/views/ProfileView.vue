@@ -127,7 +127,7 @@ function goToPost(postId) {
 
 const isOwnProfile = computed(() => {
   const userId = parseInt(localStorage.getItem('user_id'))
-  return userId && userId === profile.value.user_id
+  return userId && userId === profile.value.id
 })
 
 async function fetchProfile() {

@@ -13,7 +13,7 @@ This project was built to deepen my understanding of Django in a multi-app archi
 
 
 
-https://github.com/user-attachments/assets/1448582d-41cb-4f42-9771-35ccb08cc106
+https://github.com/user-attachments/assets/0aff1a30-3f37-4097-b7ac-3970ad728f5e
 
 
 
